@@ -66,12 +66,12 @@ int main(void) {
         return 1;
     }
 
-    for (i = 0; i < row; i++) {
-        array[i] = data + i * col;
-    }
-
     for (i = 0; i < row * col; i++) {
         data[i] = ' ';
+    }
+
+    for (i = 0; i < row; i++) {
+        array[i] = data + i * col;
     }
 
     /* Allocate artifact data */
@@ -86,7 +86,7 @@ int main(void) {
     }
 
     for (i = 0; i < artifacts; i++) {
-        artifactCodes[i] = (char *)malloc(6 * sizeof(char));
+        artifactCodes[i] = (char *)malloc(artifacts * sizeof(char));
         artifactFound[i] = 0;
     }
 
@@ -123,7 +123,7 @@ int main(void) {
             y = rand() % row;
 
             conflict = 0;
-            for(j = 0; j < i; j++) {
+            for(j = 0; j < artifacts; j++) {
                 if(artifactX[j] == x && artifactY[j] == y) {
                     conflict = 1;
                     break;
