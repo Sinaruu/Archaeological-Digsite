@@ -2,6 +2,7 @@
 #include <stdlib.h>
 #include <string.h>
 #include <ctype.h>
+#include <time.h>
 
 #define MIN_SIZE 2
 #define MAX_SIZE 40
@@ -23,7 +24,7 @@ int isValidCode(const char *code);
 int isDuplicate(char **artifactCodes, int count, const char *code);
 
 int main(void) {
-    int row, col, artifacts, i;
+    int row, col, artifacts, i, j, placed, conflict, x, y;
     char *data;
     char **array;
     char **artifactCodes;
@@ -108,6 +109,31 @@ int main(void) {
             } else {
                 strcpy(artifactCodes[i], temp);
                 valid = 1;
+            }
+        }
+    }
+
+    /* Random number generator for artifact placement */
+    srand((unsigned int)time(NULL));
+
+    for(i = 0; i < artifacts; i++) {
+        placed = 0;
+        while(!placed) {
+            x = rand() % col;
+            y = rand() % row;
+
+            conflict = 0;
+            for(j = 0; j < i; j++) {
+                if(artifactX[j] == x && artifactY[j] == y) {
+                    conflict = 1;
+                    break;
+                }
+            }
+
+            if(!conflict) {
+                artifactX[i] = x;
+                artifactY[i] = y;
+                placed = 1;
             }
         }
     }
