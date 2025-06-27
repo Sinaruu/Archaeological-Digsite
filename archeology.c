@@ -16,8 +16,6 @@
 #define POINTS_PER_GREATER 2
 #define POINTS_PER_LESSER 1
 
-#define DEBUG_MODE 1
-
 #define MEMORY_ERROR_MSG "Failed to allocate memory.\n"
 
 int isValidCode(const char *code);
@@ -26,10 +24,13 @@ void freeArtifacts(char **codes, int *x, int *y, int *found, int count);
 int getArtifactValue(const char *code);
 
 int main(void) {
-    int row, col, artifacts, i;
+    int row, col, artifacts, i, r, c;
     char *map;
     char **artifactCodes;
     int *artifactX, *artifactY, *artifactFound;
+
+    int score = 0;
+    int debugMode = 0;
 
     printf("Rows (%d-%d u): ", MIN_SIZE, MAX_SIZE);
     if (scanf("%d", &row) != 1) return printf("Invalid input.\n"), 1;
@@ -80,7 +81,10 @@ int main(void) {
         char temp[5];
         while (!valid) {
             printf("Enter artifact code #%d (letter + 3 digits): ", i + 1);
-            if (scanf("%4s", temp) != 1) return printf("Invalid input.\n"), 1;
+            if (scanf("%4s", temp) != 1) {
+                return printf("Invalid input.\n"), 1;
+            }
+
             if (!isValidCode(temp)) {
                 printf("Incorrect entry. Codes must be a letter and three digits.\n");
             } else if (isDuplicate(artifactCodes, i, temp)) {
@@ -91,6 +95,8 @@ int main(void) {
             }
         }
     }
+
+    /* Randomly placing the artifacts */
 
     srand((unsigned int)time(NULL));
     for (i = 0; i < artifacts; i++) {
@@ -113,7 +119,45 @@ int main(void) {
         }
     }
 
-    /* Gameplay loop to be implemented */
+    while(1) {
+
+        /* Display the map */
+
+        printf("Map\n   ");
+        for(i = 0; i < col; i++) {
+            printf("%d", i % 10);
+        }
+        printf("\n   ");
+        for(i = 0; i < col; i++) {
+            printf("-");
+        }
+        printf("\n");
+
+        for(r = 0; r < row; r++) {
+            printf("%02d|", r);
+            for(c = 0; c < row; c++) {
+                char symbol = map[r * col + c];
+
+                if(debugMode && symbol == ' ') {
+                    for(i = 0; i < artifacts; i++) {
+                        if(!artifactFound[i] && artifactX[i] == c && artifactY[i] == r) {
+                            symbol = UNFOUND_ARTIFACT_DEBUG;
+                        }
+                    }
+                }
+
+                putchar(symbol);
+            }
+
+            printf("\n");
+        }
+
+        int choice;
+        printf("1: Dig a spot\n2: Exit\n3: Activate debug mode\n-> ");
+        scanf("%d", &choice);
+    }
+
+    /* Free memory */
 
     freeArtifacts(artifactCodes, artifactX, artifactY, artifactFound, artifacts);
     free(map);
@@ -139,12 +183,20 @@ int isDuplicate(char **artifactCodes, int count, const char *code) {
 void freeArtifacts(char **codes, int *x, int *y, int *found, int count) {
     int i;
     if (codes) {
-        for (i = 0; i < count; i++) free(codes[i]);
+        for (i = 0; i < count; i++) {
+            free(codes[i]);
+        }
         free(codes);
     }
-    if (x) free(x);
-    if (y) free(y);
-    if (found) free(found);
+    if (x) {
+        free(x);
+    }
+    if (y) {
+        free(y);
+    }
+    if (found) {
+        free(found);
+    }
 }
 
 int getArtifactValue(const char *code) {
